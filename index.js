@@ -345,8 +345,8 @@ const postFeedback = async (
           `Telegram | Unhelpful/POST COVID Verification`
         );
         let supplier_location =
-          resp.data.data[0].location + ", " + resp.data.data[0].state;
-        let mSuppID = resp.data.data[0].uuid;
+          response.data.data[0].location + ", " + response.data.data[0].state;
+        let mSuppID = response.data.data[0].uuid;
         let fullname = ctx.chat.first_name + "  " + ctx.chat.last_name;
         let data = JSON.stringify({
           fields: {
