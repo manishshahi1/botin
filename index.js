@@ -344,8 +344,19 @@ const postFeedback = async (
           `https://api.covidcitizens.org/api/v2/leadbyqueryintrobot?location=${c}&category=${s}&verifierID=${userID}`,
           `Telegram | Unhelpful/POST COVID Verification`
         );
-        let supplier_location =
-          response.data.data[0].location + ", " + response.data.data[0].state;
+        let mlocation;
+        let mstate;
+        if (
+          response.data.data[0].location === undefined ||
+          response.data.data[0].state === undefined
+        ) {
+          mlocation = null;
+          mstate = null;
+        } else {
+          mlocation = response.data.data[0].location;
+          mstate = response.data.data[0].state;
+        }
+        let supplier_location = mlocation + ", " + mstate;
         let mSuppID = response.data.data[0].uuid;
         let fullname = ctx.chat.first_name + "  " + ctx.chat.last_name;
         let data = JSON.stringify({
