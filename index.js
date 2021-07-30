@@ -6,7 +6,7 @@ const expressApp = express();
 const API_TOKEN =
   process.env.API_TOKEN || "1936078013:AAGrLH4rQv6mxOSJWHAZjxFjFI_6mDd3vAM";
 const PORT = 3000;
-const URL = process.env.URL || "https://introbot-in.herokuapp.com";
+const URL = process.env.URL || "https://botin1.herokuapp.com/";
 const bot = new Telegraf(API_TOKEN);
 bot.use(session());
 //method for invoking start command
@@ -484,7 +484,7 @@ bot.on("text", (ctx) => {
   }
 });
 
-expressApp.get("/", (req, res) => {
+expressApp.get("/welcome", (req, res) => {
   res.send("Welcome to Introbot Indonesia");
 });
 expressApp.listen(PORT, () => {
