@@ -484,7 +484,7 @@ bot.on("text", (ctx) => {
   }
 });
 
-expressApp.get("/welcome", (req, res) => {
+expressApp.get("/", (req, res) => {
   res.send("Welcome to Introbot Indonesia");
 });
 expressApp.listen(PORT, () => {
