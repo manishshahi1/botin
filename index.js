@@ -342,6 +342,19 @@ const postFeedback = async (
       //fetch results for query
       if (fields) {
         if (feedback === `helpful`) {
+          let lang = ctx.session.language;
+          if (lang === `en`) {
+            let text = `I just found Helpful contact for ${ctx.message.text} through Introbot! It's truly #SavingAMillionLives! Try it out yourself.`;
+            await ctx.reply(
+              `That's great! Consider sharing the following message with your friends and family and network.`
+            );
+            await ctx.reply(
+              `I just found Helpful contact for ${ctx.message.text} through Introbot! It's truly #SavingAMillionLives! Try it out yourself.`
+            );
+            await ctx.reply(
+              `Share this link: https://t.me/share/url?url=https://t.me/introbot_help_bot&text=${text}`
+            );
+          }
         } else {
           await fetchResources(
             ctx,
@@ -434,19 +447,6 @@ bot.hears(
     @bot hears callback for buttons
 */
 bot.action("helpful", async (ctx, next) => {
-  let lang = ctx.session.language;
-  if (lang === `en`) {
-    let text = `I just found Helpful contact for ${ctx.message.text} through Introbot! It's truly #SavingAMillionLives! Try it out yourself.`;
-    await ctx.reply(
-      `That's great! Consider sharing the following message with your friends and family and network.`
-    );
-    await ctx.reply(
-      `I just found Helpful contact for ${ctx.message.text} through Introbot! It's truly #SavingAMillionLives! Try it out yourself.`
-    );
-    await ctx.reply(
-      `Share this link: https://t.me/share/url?url=https://t.me/introbot_help_bot&text=${text}`
-    );
-  }
   postFeedback(
     ctx,
     globalSupplierID,
