@@ -442,7 +442,6 @@ bot.hears(
     }
   }
 );
-
 /* 
     @bot hears callback for buttons
 */
