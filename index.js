@@ -342,6 +342,7 @@ const postFeedback = async (
       //fetch results for query
       if (fields) {
         if (feedback === `helpful`) {
+          console.log(`helpful`);
         } else {
           await fetchResources(
             ctx,
