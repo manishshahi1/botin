@@ -1,13 +1,15 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 import { Telegraf } from "telegraf";
 import session from "@telegraf/session";
 import axios from "axios";
+require("dotenv").config();
 import express from "express";
 const expressApp = express();
-const API_TOKEN =
-  process.env.API_TOKEN || "1936078013:AAGrLH4rQv6mxOSJWHAZjxFjFI_6mDd3vAM";
-const PORT = process.env.PORT;
+const API_TOKEN = process.env.API_TOKEN;
 const URL = process.env.URL || "https://botin1.herokuapp.com";
 const bot = new Telegraf(API_TOKEN);
+const PORT = process.env.PORT;
 bot.use(session());
 //method for invoking start command
 //method for invoking start command
@@ -134,9 +136,9 @@ var fetchResources = async (ctx, url, requestType) => {
     console.log(data);
     let config = {
       method: "post",
-      url: "https://api.airtable.com/v0/appHbvQKMtjBWjKKU/COVID%20Log",
+      url: process.env.AIRTABLE_URL,
       headers: {
-        Authorization: "Bearer keyUO2phAn88sMvvW",
+        Authorization: process.env.AIRTABLE_KEY,
         "Content-Type": "application/json",
       },
       data: data,
@@ -339,51 +341,54 @@ const postFeedback = async (
       const c = city.replace(/\s/g, "");
       //fetch results for query
       if (fields) {
-        await fetchResources(
-          ctx,
-          `https://api.covidcitizens.org/api/v2/leadbyqueryintrobot?location=${c}&category=${s}&verifierID=${userID}`,
-          `Telegram | Unhelpful/POST COVID Verification`
-        );
-        let mlocation;
-        let mstate;
-        if (
-          response.data.data[0].location === undefined ||
-          response.data.data[0].state === undefined
-        ) {
-          mlocation = null;
-          mstate = null;
+        if (feedback === `helpful`) {
         } else {
-          mlocation = response.data.data[0].location;
-          mstate = response.data.data[0].state;
-        }
-        let supplier_location = mlocation + ", " + mstate;
-        let mSuppID = response.data.data[0].uuid;
-        let fullname = ctx.chat.first_name + "  " + ctx.chat.last_name;
-        let data = JSON.stringify({
-          fields: {
-            Log: `"Supplier ID: ${mSuppID}, \t Supplier Name: ${sname}, \t Supplier Phone: ${phone}, \t Supplier Location: ${supplier_location}"`,
-            Query: ctx.session.query,
-            "Verifier ID": `"Telegram Username: ${ctx.chat.username}, Full Name: ${fullname}, UserID: ${ctx.chat.id}"`,
-            Type: requestType,
-          },
-        });
-        console.log(data);
-        let config = {
-          method: "post",
-          url: "https://api.airtable.com/v0/appHbvQKMtjBWjKKU/COVID%20Log",
-          headers: {
-            Authorization: "Bearer keyUO2phAn88sMvvW",
-            "Content-Type": "application/json",
-          },
-          data: data,
-        };
-        axios(config)
-          .then((response) => {
-            console.log(JSON.stringify(response.data));
-          })
-          .catch((error) => {
-            console.log(error);
+          await fetchResources(
+            ctx,
+            `https://api.covidcitizens.org/api/v2/leadbyqueryintrobot?location=${c}&category=${s}&verifierID=${userID}`,
+            `Telegram | Unhelpful/POST COVID Verification`
+          );
+          let mlocation;
+          let mstate;
+          if (
+            response.data.data[0].location === undefined ||
+            response.data.data[0].state === undefined
+          ) {
+            mlocation = null;
+            mstate = null;
+          } else {
+            mlocation = response.data.data[0].location;
+            mstate = response.data.data[0].state;
+          }
+          let supplier_location = mlocation + ", " + mstate;
+          let mSuppID = response.data.data[0].uuid;
+          let fullname = ctx.chat.first_name + "  " + ctx.chat.last_name;
+          let data = JSON.stringify({
+            fields: {
+              Log: `"Supplier ID: ${mSuppID}, \t Supplier Name: ${sname}, \t Supplier Phone: ${phone}, \t Supplier Location: ${supplier_location}"`,
+              Query: ctx.session.query,
+              "Verifier ID": `"Telegram Username: ${ctx.chat.username}, Full Name: ${fullname}, UserID: ${ctx.chat.id}"`,
+              Type: requestType,
+            },
           });
+          console.log(data);
+          let config = {
+            method: "post",
+            url: process.env.AIRTABLE_URL,
+            headers: {
+              Authorization: process.env.AIRTABLE_KEY,
+              "Content-Type": "application/json",
+            },
+            data: data,
+          };
+          axios(config)
+            .then((response) => {
+              console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
       }
     })
     .catch((error) => {
@@ -429,6 +434,19 @@ bot.hears(
     @bot hears callback for buttons
 */
 bot.action("helpful", async (ctx, next) => {
+  let lang = ctx.session.language;
+  if (lang === `en`) {
+    let text = `I just found Helpful contact for ${ctx.message.text} through Introbot! It's truly #SavingAMillionLives! Try it out yourself.`;
+    await ctx.reply(
+      `That's great! Consider sharing the following message with your friends and family and network.`
+    );
+    await ctx.reply(
+      `I just found Helpful contact for ${ctx.message.text} through Introbot! It's truly #SavingAMillionLives! Try it out yourself.`
+    );
+    await ctx.reply(
+      `Share this link: https://t.me/share/url?url=https://t.me/introbot_help_bot&text=${text}`
+    );
+  }
   postFeedback(
     ctx,
     globalSupplierID,
